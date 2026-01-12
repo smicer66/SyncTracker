@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true" scanPeriod="30 seconds">
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+<!--    <property resource="application-docker.properties" />-->
+    <property resource="application.properties" />
+    <property name="LOG_LEVEL" value="${LOGGING_LEVEL:-INFO}" />
+    <property name="LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss.SSS} %5level ${PID:- } --- [%t] %-40.40logger{40} : %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}"/>
+    <property name="CHARSET" value="UTF8" />
+
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>${LOG_LEVEL}</level>
+        </filter>
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+            <charset>${CHARSET}</charset>
+        </encoder>
+    </appender>
+
+    <appender name="FILE" class="net.logstash.logback.appender.LoggingEventAsyncDisruptorAppender">
+        <appender class="ch.qos.logback.core.rolling.RollingFileAppender">
+            <file>logs/arbiter-api.log</file>
+            <append>true</append>
+            <encoder>
+                <pattern>${LOG_PATTERN}</pattern>
+                <charset>${CHARSET}</charset>
+            </encoder>
+            <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+                <fileNamePattern>logs/arbiter-api-%d{yyyy-MM-dd}.%i.log.zip</fileNamePattern>
+                <maxHistory>7</maxHistory>
+                <timeBasedFileNamingAndTriggeringPolicy
+                        class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                    <maxFileSize>10MB</maxFileSize>
+                </timeBasedFileNamingAndTriggeringPolicy>
+            </rollingPolicy>
+        </appender>
+    </appender>
+
+    <appender name="kafkaAppender" class="com.github.danielwegener.logback.kafka.KafkaAppender">
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder"/>
+        <topic>arbiter-api-logs</topic>
+        <keyingStrategy class="com.github.danielwegener.logback.kafka.keying.NoKeyKeyingStrategy"/>
+        <deliveryStrategy class="com.github.danielwegener.logback.kafka.delivery.AsynchronousDeliveryStrategy"/>
+        <producerConfig>bootstrap.servers=${bootstrap.servers}</producerConfig>
+        <!--        <producerConfig>block.on.buffer.full=false</producerConfig>-->
+        <!-- this is the fallback appender if kafka is not available. -->
+        <appender-ref ref="FILE"/>
+    </appender>
+
+    <appender name="LOGSTASH" class="net.logstash.logback.appender.LogstashSocketAppender">
+        <host>${LOGSTASH_HOST:-172.25.20.100}</host>
+        <port>${LOGSTASH_PORT:-9012}</port>
+        <timeZone>UTC</timeZone>
+        <provider class="net.logstash.logback.composite.loggingevent.LoggingEventPatternJsonProvider">
+            <pattern>
+                {
+                "severity": "%level",
+                "service": "Arbiter API",
+                "pid": "${PID:-}",
+                "thread": "%thread",
+                "class": "%logger{40}",
+                "message": "%message %replace(%exception){'\n','\u2028'}%nopex%n"
+                }
+            </pattern>
+        </provider>
+    </appender>
+
+    <appender name="TOMCAT" class="net.logstash.logback.appender.LoggingEventAsyncDisruptorAppender">
+        <appender class="ch.qos.logback.core.rolling.RollingFileAppender">
+            <file>tomcat/logs/tomcat.log</file>
+            <append>true</append>
+            <encoder>
+                <pattern>${LOG_PATTERN}</pattern>
+                <charset>${CHARSET}</charset>
+            </encoder>
+            <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+                <fileNamePattern>tomcat/logs/tomcat-%d{yyyy-MM-dd}.log.zip</fileNamePattern>
+                <maxHistory>7</maxHistory>
+            </rollingPolicy>
+        </appender>
+    </appender>
+
+    <logger name="org.apache.catalina" level="${LOG_LEVEL}" additivity="false">
+        <appender-ref ref="TOMCAT" />
+    </logger>
+
+    <logger name="org.apache.coyote" level="${LOG_LEVEL}" additivity="false">
+        <appender-ref ref="TOMCAT" />
+    </logger>
+
+    <logger name="org.apache.tomcat" level="${LOG_LEVEL}" additivity="false">
+        <appender-ref ref="TOMCAT" />
+    </logger>
+
+    <logger name="iswLogger" level="${LOG_LEVEL}" additivity="false">
+        <appender-ref ref="FILE"/>
+        <appender-ref ref="CONSOLE" />
+        <appender-ref ref="LOGSTASH"/>
+        <appender-ref ref="kafkaAppender"/>
+        <appender-ref ref="TOMCAT"/>
+    </logger>
+
+    <root level="${LOG_LEVEL}">
+        <appender-ref ref="CONSOLE" />
+        <appender-ref ref="LOGSTASH"/>
+        <appender-ref ref="kafkaAppender"/>
+    </root>
+</configuration>
