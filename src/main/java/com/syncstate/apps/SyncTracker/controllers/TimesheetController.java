@@ -7,6 +7,7 @@ import com.syncstate.apps.SyncTracker.models.requests.CreateTimesheetClockInRequ
 import com.syncstate.apps.SyncTracker.models.requests.CreateTimesheetClockOutRequest;
 import com.syncstate.apps.SyncTracker.models.responses.CreateUserResponse;
 import com.syncstate.apps.SyncTracker.models.responses.GetEmployeeTimesheetResponse;
+import com.syncstate.apps.SyncTracker.models.responses.SmartBankingResponse;
 import com.syncstate.apps.SyncTracker.models.responses.TimesheetClockInResponse;
 import com.syncstate.apps.SyncTracker.service.TimeSheetService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,8 +54,9 @@ public class TimesheetController {
     @RequestMapping(value = "/apply-timesheet-adjustment", method = RequestMethod.POST)
     public ResponseEntity applyTimesheetAdjustment(@RequestBody ApplyTimesheetAdjustmentRequest applyTimesheetAdjustmentRequest)
     {
-        GetEmployeeTimesheetResponse getEmployeeTimesheetResponse = timeSheetService.applyTimesheetAdjustment(applyTimesheetAdjustmentRequest);
-        return ResponseEntity.ok().body(getEmployeeTimesheetResponse);
+
+        SmartBankingResponse smartBankingResponse = timeSheetService.applyTimesheetAdjustment(applyTimesheetAdjustmentRequest);
+        return ResponseEntity.ok().body(smartBankingResponse);
     }
 
 
