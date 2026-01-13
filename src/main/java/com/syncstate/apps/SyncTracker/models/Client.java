@@ -1,0 +1,47 @@
+package com.syncstate.apps.SyncTracker.models;
+
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.syncstate.apps.SyncTracker.deserializers.TimestampDeserializer;
+import com.syncstate.apps.SyncTracker.serializers.JsonDateTimeSerializer;
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+
+import java.math.BigInteger;
+import java.time.LocalDateTime;
+
+@Entity
+@Table(name = "clients")
+@Getter
+@Setter
+public class Client {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private BigInteger clientId;
+
+    @Column(name = "clientName", nullable = false)
+    private String clientName;
+
+    @Column(name = "currentAddressId", nullable = false)
+    private BigInteger currentClientAddressId;
+
+    @JsonSerialize(using = JsonDateTimeSerializer.class)
+    @JsonDeserialize(using = TimestampDeserializer.class)
+    @Column(nullable= false)
+    private LocalDateTime createdAt;
+
+    @JsonSerialize(using = JsonDateTimeSerializer.class)
+    @JsonDeserialize(using = TimestampDeserializer.class)
+    @Column(nullable= true)
+    private LocalDateTime deletedAt;
+
+    @JsonSerialize(using = JsonDateTimeSerializer.class)
+    @JsonDeserialize(using = TimestampDeserializer.class)
+    @Column(nullable= false)
+    private LocalDateTime updatedAt;
+
+
+
+}

@@ -8,8 +8,8 @@ import java.util.Map;
 @Getter
 @Setter
 public class SmartBankingResponse {
-    private String statusCode;
+    private int statusCode;
     private String message;
-    private Map<String, Object> responseObject;
+    private Map responseObject;
 
 }
