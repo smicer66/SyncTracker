@@ -48,6 +48,18 @@ public class EmploymentController {
         return ResponseEntity.ok().body(createNewEmployeeContractResponse);
     }
 
+    @RequestMapping(value = "/create-new-employee-contract-template", method = RequestMethod.POST)
+    public ResponseEntity createNewEmployeeContractTemplate(@RequestBody CreateNewEmployeeContractTemplateRequest createNewEmployeeContractTemplateRequest)
+    {
+        SmartBankingResponse createNewEmployeeContractTemplateResponse = employmentService.createNewEmployeeContractTemplate(createNewEmployeeContractTemplateRequest);
+        return ResponseEntity.ok().body(createNewEmployeeContractTemplateResponse);
+    }
 
+    @RequestMapping(value = "/get-employee-contract-templates/{clientId}", method = RequestMethod.GET)
+    public ResponseEntity getEmployeeTimesheet(@PathVariable BigInteger clientId)
+    {
+        SmartBankingResponse smartBankingResponse = employmentService.getEmployeeContractTemplateByClientId(clientId);
+        return ResponseEntity.ok().body(smartBankingResponse);
+    }
 
 }

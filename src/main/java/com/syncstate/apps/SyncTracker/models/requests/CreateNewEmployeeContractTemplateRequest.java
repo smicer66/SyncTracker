@@ -2,8 +2,6 @@ package com.syncstate.apps.SyncTracker.models.requests;
 
 
 import com.syncstate.apps.SyncTracker.models.enums.ContractType;
-import com.syncstate.apps.SyncTracker.models.enums.Gender;
-import jakarta.persistence.Column;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -12,11 +10,10 @@ import java.time.LocalDate;
 
 @Getter
 @Setter
-public class CreateNewEmployeeContractRequest {
+public class CreateNewEmployeeContractTemplateRequest {
 
     private BigInteger clientId;
 
-    private BigInteger employeeId;
 
     private ContractType contractType;     // FULL_TIME, PART_TIME, CASUAL
 
@@ -33,6 +30,4 @@ public class CreateNewEmployeeContractRequest {
     private Double overtimeMultiplier; // e.g. 1.5
 
     private String governingLaw;
-
-    private String jobTitle;
 }

@@ -12,6 +12,7 @@ import com.syncstate.apps.SyncTracker.models.responses.SmartBankingResponse;
 import com.syncstate.apps.SyncTracker.models.responses.TimesheetClockInResponse;
 import com.syncstate.apps.SyncTracker.repositories.*;
 import jakarta.servlet.http.HttpServletRequest;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -45,6 +46,9 @@ public class EmploymentService {
 
     @Autowired
     private HttpServletRequest request;
+
+    @Autowired
+    private IEmployeeContractTemplateRepository iEmployeeContractTemplateRepository;
 
     public SmartBankingResponse createNewEmployee(CreateNewEmployeeRequest createNewEmployeeRequest) throws SyncTrackerException {
         Employee employee = new Employee();
@@ -97,6 +101,42 @@ public class EmploymentService {
         SmartBankingResponse smartBankingResponse = new SmartBankingResponse();
         smartBankingResponse.setMessage("A new employment contract has been created for the employee. Please send the employee an invitation to " +
                 "sign up on SyncTracker mobile app to manage their shifts and timesheets.");
+        smartBankingResponse.setStatusCode(0);
+        smartBankingResponse.setResponseObject(responseObject);
+
+        return smartBankingResponse;
+    }
+
+
+    public SmartBankingResponse createNewEmployeeContractTemplate(CreateNewEmployeeContractTemplateRequest createNewEmployeeContractTemplateRequest) {
+        EmployeeContractTemplate employeeContractTemplate = new EmployeeContractTemplate();
+        BeanUtils.copyProperties(createNewEmployeeContractTemplateRequest, employeeContractTemplate);
+
+        employeeContractTemplate = (EmployeeContractTemplate) iEmployeeContractTemplateRepository.save(employeeContractTemplate);
+
+        employeeContractTemplate.setContractCode(String.format("%04d", employeeContractTemplate.getEmployeeContractTemplateId()));
+        iEmployeeContractTemplateRepository.save(employeeContractTemplate);
+
+        Map responseObject = new HashMap();
+        responseObject.put("employeeContractTemplate", employeeContractTemplate);
+
+        SmartBankingResponse smartBankingResponse = new SmartBankingResponse();
+        smartBankingResponse.setMessage("A new employment contract template has been created. You can use this template to " +
+                "automate the issuance of contracts to employees. The contract code is " + employeeContractTemplate.getContractCode());
+        smartBankingResponse.setStatusCode(0);
+        smartBankingResponse.setResponseObject(responseObject);
+
+        return smartBankingResponse;
+    }
+
+
+    public SmartBankingResponse getEmployeeContractTemplateByClientId(BigInteger clientId)
+    {
+        Collection<EmployeeContractTemplate> employeeContractTemplateList = this.iEmployeeContractTemplateRepository.getEmployeeContractTemplateByClientId(clientId);
+        Map responseObject = new HashMap();
+        responseObject.put("employeeContractTemplateList", employeeContractTemplateList);
+
+        SmartBankingResponse smartBankingResponse = new SmartBankingResponse();
         smartBankingResponse.setStatusCode(0);
         smartBankingResponse.setResponseObject(responseObject);
 

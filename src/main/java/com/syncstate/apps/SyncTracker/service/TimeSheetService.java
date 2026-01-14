@@ -6,6 +6,7 @@ import com.syncstate.apps.SyncTracker.exceptions.SyncTrackerException;
 import com.syncstate.apps.SyncTracker.models.*;
 import com.syncstate.apps.SyncTracker.models.enums.TimesheetActivityType;
 import com.syncstate.apps.SyncTracker.models.requests.ApplyTimesheetAdjustmentRequest;
+import com.syncstate.apps.SyncTracker.models.requests.CreateScheduledWorkShiftRequest;
 import com.syncstate.apps.SyncTracker.models.requests.CreateTimesheetClockInRequest;
 import com.syncstate.apps.SyncTracker.models.requests.CreateTimesheetClockOutRequest;
 import com.syncstate.apps.SyncTracker.models.responses.CreateUserResponse;
@@ -22,11 +23,10 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import com.syncstate.apps.SyncTracker.models.dto.EmployeeTimeSheetDTO;
 
@@ -54,11 +54,15 @@ public class TimeSheetService {
     @Autowired
     private ITimesheetAdjustmentRepository iTimesheetAdjustmentRepository;
 
+    @Autowired
+    private IClientRepository iClientRepository;
+
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
     private HttpServletRequest request;
 
+    private DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-mm-dd HH:ii");
 
 
     public GetEmployeeTimesheetResponse getEmployeeTimesheet(BigInteger employeeId, BigInteger clientId)
@@ -206,6 +210,53 @@ public class TimeSheetService {
 
     private Map responseObject;
     public SmartBankingResponse applyTimesheetAdjustment(ApplyTimesheetAdjustmentRequest applyTimesheetAdjustmentRequest) {
+        TimesheetAdjustment timesheetAdjustment = new TimesheetAdjustment();
+        BeanUtils.copyProperties(applyTimesheetAdjustmentRequest, timesheetAdjustment);
+        timesheetAdjustment = (TimesheetAdjustment) iTimesheetAdjustmentRepository.save(timesheetAdjustment);
+
+        SmartBankingResponse smartBankingResponse = new SmartBankingResponse();
+        smartBankingResponse.setStatusCode(0);
+        smartBankingResponse.setMessage("An adjustment has been made to the employees timesheet entry.");
+        return smartBankingResponse;
+    }
+
+
+    public SmartBankingResponse createScheduledWorkShift(String clientCode, SyncTrackerEmailKafkaService syncTrackerEmailKafkaService,
+         List<CreateScheduledWorkShiftRequest> createScheduledWorkShiftRequestList) {
+
+        Client client = this.iClientRepository.getClientByBankCode(clientCode);
+        Map<BigInteger, List<String>> employeeList = new HashMap<BigInteger, List<String>>();
+        List<String> steList = new ArrayList<>();
+        steList  = createScheduledWorkShiftRequestList.stream().map(cs -> {
+            ScheduledWork scheduledWork = new ScheduledWork();
+            scheduledWork.setCreatedByEmployeeId(cs.getCreatedByEmployeeId());
+            scheduledWork.setExpectedEndTime(cs.getExpectedEndTime());
+            scheduledWork.setExpectedStartTime(cs.getExpectedStartTime());
+            scheduledWork.setEmployeeId(cs.getEmployeeId());
+            scheduledWork.setExpectedBreakPeriodInMins(cs.getExpectedBreakPeriodInMins());
+            scheduledWork = (ScheduledWork) iScheduledWorkRepository.save(scheduledWork);
+
+            Set employeeKeySet = employeeList.keySet();
+
+            if(employeeKeySet.contains(cs.getEmployeeId()))
+            {
+                steList = employeeList.get(cs.getEmployeeId());
+            }
+            steList.add(client.getClientName());
+            steList.add(scheduledWork.getExpectedStartTime().format(dtf));
+            steList.add(scheduledWork.getExpectedEndTime().format(dtf));
+
+            return steList;
+        }).collect(Collectors.toList());
+
+        steList.stream().map(s ->
+        {
+            SyncTrackerEmail syncTrackerEmail = new SyncTrackerEmail();
+            syncTrackerEmail.setEmailSubject("Your new shifts - " + client.getClientName());
+            syncTrackerEmail.setEmailMessage(s);
+            syncTrackerEmail.setEmailRecipient();
+        });
+
         TimesheetAdjustment timesheetAdjustment = new TimesheetAdjustment();
         BeanUtils.copyProperties(applyTimesheetAdjustmentRequest, timesheetAdjustment);
         timesheetAdjustment = (TimesheetAdjustment) iTimesheetAdjustmentRepository.save(timesheetAdjustment);

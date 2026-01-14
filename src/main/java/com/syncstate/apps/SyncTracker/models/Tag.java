@@ -3,34 +3,28 @@ package com.syncstate.apps.SyncTracker.models;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.probase.potzr.SmartBanking.models.enums.TokenType;
 import com.syncstate.apps.SyncTracker.deserializers.TimestampDeserializer;
 import com.syncstate.apps.SyncTracker.serializers.JsonDateTimeSerializer;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigInteger;
 import java.time.LocalDateTime;
 
-@Entity
-@Table(name = "tokens")
 @Getter
 @Setter
-public class Token {
+@Entity
+@Table(name="tags")
+public class Tag {
+    @Column(name = "tagTitle", nullable = false)
+    private String tagTitle;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private BigInteger tokenId;
-
-    @Column(name = "token", nullable = false)
-    private String token;
-
-    @Column(name = "tokenType", nullable = false)
-    private TokenType tokenType;
-
-    @Column(name = "expiredAt", nullable = false)
-    private LocalDateTime expiredAt;
+    @Column(name = "entityId", nullable = false)
+    private BigInteger entityId;
 
     @Column(name = "createdAt", nullable = false)
     @JsonSerialize(using = JsonDateTimeSerializer.class)
@@ -47,15 +41,6 @@ public class Token {
     @JsonDeserialize(using = TimestampDeserializer.class)
     private LocalDateTime deletedAt;
 
-    @Column(name = "usedAt", nullable = true)
-    private LocalDateTime usedAt;
-
-    @Column(name = "tokenOwnedByEntityId", nullable = true)
-    private BigInteger tokenOwnedByEntityId;
-
-    @Lob
-    @Column(name = "data", nullable = true)
-    private String data;
 
     @PrePersist
     public void onCreate()

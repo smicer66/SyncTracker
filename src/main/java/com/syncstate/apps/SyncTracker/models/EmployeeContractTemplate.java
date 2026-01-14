@@ -6,22 +6,18 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.LocalDate;
 
 @Getter
 @Setter
 @Entity
-@Table(name = "employee_contracts")
-public class EmployeeContract {
+@Table(name = "employee_contract_templates")
+public class EmployeeContractTemplate {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private BigInteger employeeContractId;
-
-    @Column(name = "employeeId", nullable = false)
-    private BigInteger employeeId;
+    private BigInteger employeeContractTemplateId;
 
     @Column(name = "contractType", nullable = false)
     private ContractType contractType;     // FULL_TIME, PART_TIME, CASUAL
@@ -47,8 +43,8 @@ public class EmployeeContract {
     @Column(name = "governingLaw", nullable = true)
     private String governingLaw;
 
-    @Column(name = "jobTitle", nullable = true)
-    private String jobTitle;
+    @Column(name = "contractCode", nullable = true)
+    private String contractCode;
 
     public boolean isActive(LocalDate date) {
         return (date.isEqual(startDate) || date.isAfter(startDate))

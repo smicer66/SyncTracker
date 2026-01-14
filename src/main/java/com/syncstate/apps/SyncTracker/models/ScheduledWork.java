@@ -37,6 +37,9 @@ public class ScheduledWork {
     @Column(name = "approvedByEmployeeId", nullable = true)
     private BigInteger approvedByEmployeeId;
 
+    @Column(name = "createdByEmployeeId", nullable = true)
+    private BigInteger createdByEmployeeId;
+
     @Column(name = "createdAt", nullable = false)
     @JsonSerialize(using = JsonDateTimeSerializer.class)
     @JsonDeserialize(using = TimestampDeserializer.class)

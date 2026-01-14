@@ -2,12 +2,14 @@ package com.syncstate.apps.SyncTracker.service;
 
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.probase.potzr.SmartBanking.models.enums.IdentificationDocumentType;
 import com.probase.potzr.SmartBanking.models.enums.TokenType;
 import com.probase.potzr.SmartBanking.models.enums.UserStatus;
 import com.syncstate.apps.SyncTracker.models.Token;
 import com.syncstate.apps.SyncTracker.models.User;
 import com.syncstate.apps.SyncTracker.models.requests.CreateUserRequest;
+import com.syncstate.apps.SyncTracker.models.requests.SendInvitationRequest;
 import com.syncstate.apps.SyncTracker.models.responses.CreateUserResponse;
 import com.syncstate.apps.SyncTracker.repositories.ITokenRepository;
 import com.syncstate.apps.SyncTracker.repositories.IUserRepository;
@@ -30,6 +32,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -75,7 +79,7 @@ public class UserService {
 
 
         Token token  = new Token();
-        token.setTokenOwnedByUserId(user.getUserId());
+        token.setTokenOwnedByEntityId(user.getUserId());
         token.setToken(RandomStringUtils.randomNumeric(6));
         token.setExpiredAt(LocalDateTime.now().plusHours(userAccountTokenValidPeriod));
         token.setTokenType(TokenType.SIGNUP);
@@ -95,4 +99,22 @@ public class UserService {
     }
 
 
+    public void sendInvitationRequest(List<SendInvitationRequest> sendInvitationRequestList) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        sendInvitationRequestList.stream().map(s -> {
+
+            try {
+                Token token = new Token();
+                token.setExpiredAt(LocalDateTime.now().plusDays(7));
+                token.setData(objectMapper.writeValueAsString(s));
+                token.setTokenType(TokenType.EMPLOYEE_SIGNUP_INVITATION);
+                token.setTokenOwnedByEntityId(s.getEmployeeId());
+                token.setToken(RandomStringUtils.randomAlphanumeric(64).toLowerCase());
+                token = (Token)tokenRepository.save(token);
+                return token;
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
+        });
+    }
 }
