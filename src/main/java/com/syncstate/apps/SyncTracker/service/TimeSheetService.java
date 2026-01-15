@@ -19,6 +19,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
@@ -29,6 +31,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import com.syncstate.apps.SyncTracker.models.dto.EmployeeTimeSheetDTO;
+
+import static java.util.stream.Collectors.groupingBy;
 
 @Service
 public class TimeSheetService {
@@ -64,12 +68,18 @@ public class TimeSheetService {
 
     private DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-mm-dd HH:ii");
 
+    @Value("${kafka.email.create.topic}")
+    private String createKafkaSMSTopic;
+
+    @Autowired
+    private KafkaTemplate<Long, SyncTrackerEmail> kafkaTemplate;
+
 
     public GetEmployeeTimesheetResponse getEmployeeTimesheet(BigInteger employeeId, BigInteger clientId)
     {
         Collection<Timesheet> timesheetList = this.iTimesheetRepository.getTimesheetByEmployeeId(employeeId, clientId);
         Employee employee = this.iEmployeeRepository.getEmployeeByEmployeeId(employeeId);
-        EmployeeBioData employeeBioData = this.iEmployeeBioDataRepository.getEmployeeBioDataByEmployeeId(employeeId);
+        EmployeeBioData employeeBioData = this.iEmployeeBioDataRepository.getEmployeeBioDetailsByEmployeeId(employeeId, clientId);
 
         Map<String, EmployeeTimeSheetDTO> employeeTimeSheetDTOList = new HashMap<String, EmployeeTimeSheetDTO>();
         EmployeeTimeSheetDTO employeeTimeSheetDTO = new EmployeeTimeSheetDTO();
@@ -226,7 +236,7 @@ public class TimeSheetService {
 
         Client client = this.iClientRepository.getClientByBankCode(clientCode);
         Map<BigInteger, List<String>> employeeList = new HashMap<BigInteger, List<String>>();
-        List<String> steList = new ArrayList<>();
+        List<ScheduledWork> steList = new ArrayList<>();
         steList  = createScheduledWorkShiftRequestList.stream().map(cs -> {
             ScheduledWork scheduledWork = new ScheduledWork();
             scheduledWork.setCreatedByEmployeeId(cs.getCreatedByEmployeeId());
@@ -236,30 +246,29 @@ public class TimeSheetService {
             scheduledWork.setExpectedBreakPeriodInMins(cs.getExpectedBreakPeriodInMins());
             scheduledWork = (ScheduledWork) iScheduledWorkRepository.save(scheduledWork);
 
-            Set employeeKeySet = employeeList.keySet();
-
-            if(employeeKeySet.contains(cs.getEmployeeId()))
-            {
-                steList = employeeList.get(cs.getEmployeeId());
-            }
-            steList.add(client.getClientName());
-            steList.add(scheduledWork.getExpectedStartTime().format(dtf));
-            steList.add(scheduledWork.getExpectedEndTime().format(dtf));
-
-            return steList;
+            return scheduledWork;
         }).collect(Collectors.toList());
 
-        steList.stream().map(s ->
-        {
+
+
+        Map<BigInteger, List<ScheduledWork>> scheduledWorkGroupings = steList.stream().collect(groupingBy(ScheduledWork::getEmployeeId));
+
+        scheduledWorkGroupings.keySet().stream().map(swg -> {
+            List<ScheduledWork> sw = scheduledWorkGroupings.get(swg);
+            String message = sw.stream().map(s->{
+                return s.getExpectedStartTime().format(dtf) + "|||" + s.getExpectedStartTime().format(dtf);
+            }).collect(Collectors.joining());
             SyncTrackerEmail syncTrackerEmail = new SyncTrackerEmail();
             syncTrackerEmail.setEmailSubject("Your new shifts - " + client.getClientName());
-            syncTrackerEmail.setEmailMessage(s);
-            syncTrackerEmail.setEmailRecipient();
+            syncTrackerEmail.setEmailMessage(message);
+            EmployeeBioData employeeBioData = this.iEmployeeBioDataRepository.getEmployeeBioDetailsByEmployeeId(sw.get(0).getEmployeeId(), client.getClientId());
+            syncTrackerEmail.setEmailRecipient(employeeBioData.getEmailAddress());
+
+            this.kafkaTemplate.send(createKafkaSMSTopic, syncTrackerEmail);
+
+            return null;
         });
 
-        TimesheetAdjustment timesheetAdjustment = new TimesheetAdjustment();
-        BeanUtils.copyProperties(applyTimesheetAdjustmentRequest, timesheetAdjustment);
-        timesheetAdjustment = (TimesheetAdjustment) iTimesheetAdjustmentRepository.save(timesheetAdjustment);
 
         SmartBankingResponse smartBankingResponse = new SmartBankingResponse();
         smartBankingResponse.setStatusCode(0);

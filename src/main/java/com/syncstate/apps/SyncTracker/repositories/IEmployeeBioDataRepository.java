@@ -14,5 +14,9 @@ import java.math.BigInteger;
 public interface IEmployeeBioDataRepository extends JpaRepository<EmployeeBioData, BigInteger> {
 
     @Query("Select tp from EmployeeBioData tp WHERE tp.deletedAt IS NULL AND tp.employeeBioDataId = :employeeBioDataId")
-    EmployeeBioData getEmployeeBioDataByEmployeeId(BigInteger employeeBioDataId);
+    EmployeeBioData getEmployeeBioDataByEmployeeBioId(BigInteger employeeBioDataId);
+
+    @Query(value = "Select tp from employee_bio_data tp WHERE tp.deletedAt IS NULL AND tp.employeeId = :employeeId " +
+            "AND tp.clientId = :clientId", nativeQuery = true)
+    EmployeeBioData getEmployeeBioDetailsByEmployeeId(BigInteger employeeId, BigInteger clientId);
 }

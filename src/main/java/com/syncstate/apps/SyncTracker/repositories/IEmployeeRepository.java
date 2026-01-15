@@ -16,6 +16,8 @@ public interface IEmployeeRepository extends JpaRepository<Employee, BigInteger>
     @Query("Select tp from Employee tp WHERE tp.deletedAt IS NULL AND tp.employeeId = :employeeId")
     Employee getEmployeeByEmployeeId(BigInteger employeeId);
 
-    @Query("Select tp from Employee tp WHERE tp.deletedAt IS NULL AND tp.userId = :userId AND tp.clientId = :clientId")
+    @Query(value = "Select tp from Employee tp WHERE tp.deletedAt IS NULL AND tp.userId = :userId AND tp.clientId = :clientId")
     Employee getEmployeeByUserIdAndClientId(BigInteger userId, BigInteger clientId);
+
+
 }
