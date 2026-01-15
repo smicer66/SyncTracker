@@ -66,8 +66,8 @@ public class TimesheetController {
     @RequestMapping(value = "/create-scheduled-work-shift", method = RequestMethod.POST)
     public ResponseEntity createScheduledWorkShift(@RequestBody List<CreateScheduledWorkShiftRequest> createScheduledWorkShiftRequestList)
     {
-
-        SmartBankingResponse smartBankingResponse = timeSheetService.createScheduledWorkShift(syncTrackerEmailKafkaService, createScheduledWorkShiftRequestList);
+        String clientCode = null;
+        SmartBankingResponse smartBankingResponse = timeSheetService.createScheduledWorkShift(clientCode, syncTrackerEmailKafkaService, createScheduledWorkShiftRequestList);
         return ResponseEntity.ok().body(smartBankingResponse);
     }
 

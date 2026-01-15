@@ -1,7 +1,7 @@
 package com.syncstate.apps.SyncTracker.filters;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.probase.potzr.SmartBanking.models.enums.SmartBankingStatusCode;
+import com.syncstate.apps.SyncTracker.models.enums.SmartBankingStatusCode;
 import com.syncstate.apps.SyncTracker.models.User;
 import com.syncstate.apps.SyncTracker.models.responses.SmartBankingResponse;
 import com.syncstate.apps.SyncTracker.providers.TokenProvider;
