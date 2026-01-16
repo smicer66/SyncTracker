@@ -42,6 +42,9 @@ public class EmploymentService {
     @Autowired
     private IEmployeeContractRepository iEmployeeContractRepository;
 
+    @Autowired
+    private IEmployeeGroupRepository iEmployeeGroupRepository;
+
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
@@ -135,6 +138,37 @@ public class EmploymentService {
         Collection<EmployeeContractTemplate> employeeContractTemplateList = this.iEmployeeContractTemplateRepository.getEmployeeContractTemplateByClientId(clientId);
         Map responseObject = new HashMap();
         responseObject.put("employeeContractTemplateList", employeeContractTemplateList);
+
+        SmartBankingResponse smartBankingResponse = new SmartBankingResponse();
+        smartBankingResponse.setStatusCode(0);
+        smartBankingResponse.setResponseObject(responseObject);
+
+        return smartBankingResponse;
+    }
+
+    public SmartBankingResponse createEmployeeGroup(CreateEmployeeGroupRequest createEmployeeGroup) {
+
+        EmployeeGroup employeeGroup = new EmployeeGroup();
+        BeanUtils.copyProperties(createEmployeeGroup, employeeGroup);
+
+        employeeGroup = (EmployeeGroup) this.iEmployeeGroupRepository.save(employeeGroup);
+
+        Map responseObject = new HashMap();
+        responseObject.put("employeeGroup", employeeGroup);
+
+        SmartBankingResponse smartBankingResponse = new SmartBankingResponse();
+        smartBankingResponse.setStatusCode(0);
+        smartBankingResponse.setResponseObject(responseObject);
+
+        return smartBankingResponse;
+    }
+
+    public SmartBankingResponse getEmployeeGroupByClientId(BigInteger clientId) {
+
+        List<EmployeeGroup> employeeGroup = (List<EmployeeGroup>) this.iEmployeeGroupRepository.getEmployeeGroupByClientId(clientId);
+
+        Map responseObject = new HashMap();
+        responseObject.put("employeeGroup", employeeGroup);
 
         SmartBankingResponse smartBankingResponse = new SmartBankingResponse();
         smartBankingResponse.setStatusCode(0);

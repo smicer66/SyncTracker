@@ -62,4 +62,19 @@ public class EmploymentController {
         return ResponseEntity.ok().body(smartBankingResponse);
     }
 
+    @RequestMapping(value = "/create-employee-group", method = RequestMethod.POST)
+    public ResponseEntity createEmployeeGroup(@RequestBody CreateEmployeeGroupRequest createEmployeeGroup)
+    {
+        SmartBankingResponse smartBankingResponse = employmentService.createEmployeeGroup(createEmployeeGroup);
+        return ResponseEntity.ok().body(smartBankingResponse);
+    }
+
+    @RequestMapping(value = "/get-employee-groups/{clientId}", method = RequestMethod.GET)
+    public ResponseEntity createEmployeeGroup(@PathVariable BigInteger clientId)
+    {
+        SmartBankingResponse smartBankingResponse = employmentService.getEmployeeGroupByClientId(clientId);
+        return ResponseEntity.ok().body(smartBankingResponse);
+    }
+
+
 }
