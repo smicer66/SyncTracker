@@ -5,10 +5,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.syncstate.apps.SyncTracker.deserializers.TimestampDeserializer;
 import com.syncstate.apps.SyncTracker.serializers.JsonDateTimeSerializer;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.PrePersist;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -20,6 +17,12 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name="tags")
 public class Tag {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private BigInteger tagId;
+
+
     @Column(name = "tagTitle", nullable = false)
     private String tagTitle;
 

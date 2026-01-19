@@ -26,10 +26,10 @@ public class TimesheetNote {
     @Column(name = "timesheetId", nullable = false)
     private BigInteger timesheetId;
 
-    @Column(name = "note_content", nullable = false)
+    @Column(name = "noteContent", nullable = false)
     private String noteContent;
 
-    @Column(name = "note_content", nullable = true)
+    @Column(name = "timesheetActivityType", nullable = true)
     private TimesheetActivityType timesheetActivityType;
 
     @Column(name = "noteCreatedByEmployeeId", nullable = true)

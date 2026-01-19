@@ -24,7 +24,10 @@ public class Client {
     @Column(name = "clientName", nullable = false)
     private String clientName;
 
-    @Column(name = "currentAddressId", nullable = false)
+    @Column(name = "clientCode", nullable = false)
+    private String clientCode;
+
+    @Column(name = "currentAddressId", nullable = true)
     private BigInteger currentClientAddressId;
 
     @JsonSerialize(using = JsonDateTimeSerializer.class)
