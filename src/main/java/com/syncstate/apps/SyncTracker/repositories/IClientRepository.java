@@ -10,8 +10,8 @@ import java.math.BigInteger;
 @Repository
 public interface IClientRepository extends JpaRepository<Client, BigInteger> {
 
-    @Query("Select u FROM Client u WHERE u.bankCode = :bankCode")
-    Client getClientByBankCode(String bankCode);
+    @Query("Select u FROM Client u WHERE u.clientCode = :clientCode")
+    Client getClientByClientCode(String clientCode);
 
 
     @Query("Select u from Client u WHERE u.clientName = :clientName")

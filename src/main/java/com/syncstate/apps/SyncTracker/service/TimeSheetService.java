@@ -66,7 +66,7 @@ public class TimeSheetService {
     @Autowired
     private HttpServletRequest request;
 
-    private DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-mm-dd HH:ii");
+    private DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
     @Value("${kafka.email.create.topic}")
     private String createKafkaSMSTopic;
@@ -234,7 +234,7 @@ public class TimeSheetService {
     public SmartBankingResponse createScheduledWorkShift(String clientCode, SyncTrackerEmailKafkaService syncTrackerEmailKafkaService,
          List<CreateScheduledWorkShiftRequest> createScheduledWorkShiftRequestList) {
 
-        Client client = this.iClientRepository.getClientByBankCode(clientCode);
+        Client client = this.iClientRepository.getClientByClientCode(clientCode);
         Map<BigInteger, List<String>> employeeList = new HashMap<BigInteger, List<String>>();
         List<ScheduledWork> steList = new ArrayList<>();
         steList  = createScheduledWorkShiftRequestList.stream().map(cs -> {

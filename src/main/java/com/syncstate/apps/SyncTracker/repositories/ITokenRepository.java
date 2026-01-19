@@ -13,9 +13,9 @@ import java.math.BigInteger;
 public interface ITokenRepository extends JpaRepository<Token, BigInteger> {
 
     @Query("Select tp from Token tp WHERE tp.deletedAt IS NULL AND " +
-            "tp.tokenOwnedByUserId = :tokenOwnedByUserId AND " +
+            "tp.tokenOwnedByEntityId = :tokenOwnedByEntityId AND " +
             "tp.usedAt IS NULL AND tp.token = :token AND " +
             "tp.tokenType = :tokenType AND " +
             "tp.expiredAt > CURRENT_TIMESTAMP")
-    public Token getValidToken(BigInteger tokenOwnedByUserId, String token, TokenType tokenType);
+    public Token getValidToken(BigInteger tokenOwnedByEntityId, String token, TokenType tokenType);
 }
