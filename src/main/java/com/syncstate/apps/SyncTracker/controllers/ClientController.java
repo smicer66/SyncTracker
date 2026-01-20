@@ -19,9 +19,10 @@ public class ClientController {
     ClientService clientService;
 
     @RequestMapping(value="/create-client", method = RequestMethod.POST)
-    public ResponseEntity createClient(@RequestBody CreateClientRequest createClientRequest)
+    public ResponseEntity createClient(@RequestBody(required = true) CreateClientRequest createClientRequest)
     {
         try {
+            System.out.println(createClientRequest.getClientName());
             SmartBankingResponse smartBankingResponse = clientService.createClient(createClientRequest);
             return ResponseEntity.ok().body(smartBankingResponse);
         } catch (SyncTrackerException e) {
