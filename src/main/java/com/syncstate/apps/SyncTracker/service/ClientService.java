@@ -9,6 +9,7 @@ import com.syncstate.apps.SyncTracker.models.responses.CreateUserResponse;
 import com.syncstate.apps.SyncTracker.models.responses.SmartBankingResponse;
 import com.syncstate.apps.SyncTracker.repositories.*;
 import jakarta.servlet.http.HttpServletRequest;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -36,11 +37,12 @@ public class ClientService {
     public SmartBankingResponse createClient(CreateClientRequest createClientRequest) throws SyncTrackerException {
 
         Client client = this.clientRepository.getClientByClientName(createClientRequest.getClientName());
-        if(client==null)
+        if(client!=null)
             throw new SyncTrackerException("Invalid employer name provided. Please provide another employer name.");
 
         client = new Client();
         client.setClientName(createClientRequest.getClientName());
+        client.setClientCode(RandomStringUtils.randomAlphanumeric(16).toUpperCase());
         client = (Client)this.clientRepository.save(client);
 
         if(client==null)
