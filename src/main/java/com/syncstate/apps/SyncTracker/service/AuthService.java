@@ -2,6 +2,7 @@ package com.syncstate.apps.SyncTracker.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.syncstate.apps.SyncTracker.models.requests.LoginRequest;
+import com.syncstate.apps.SyncTracker.models.requests.ValidateTokenRequest;
 import com.syncstate.apps.SyncTracker.models.responses.LoginResponse;
 import com.syncstate.apps.SyncTracker.providers.TokenProvider;
 import org.slf4j.Logger;
@@ -41,6 +42,8 @@ public class AuthService {
             logger.info("{}", authentication.isAuthenticated());
             logger.info("{}", authentication.getPrincipal());
             //        logger.info("{}>>>>", loginUser.getEmailAddress());
+
+
             SecurityContextHolder.getContext().setAuthentication(authentication);
             final String token = jwtTokenUtil.generateToken(authentication);
             logger.info("token...{}", token);
@@ -64,4 +67,5 @@ public class AuthService {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(loginResponse);
         }
     }
+
 }

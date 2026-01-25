@@ -6,7 +6,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class CreateUserResponse {
+public class CreateUserResponse extends SmartBankingResponse {
     private String username;
     private String mobileNumber;
 }

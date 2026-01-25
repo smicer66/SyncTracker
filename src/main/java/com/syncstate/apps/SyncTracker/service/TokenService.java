@@ -3,11 +3,22 @@ package com.syncstate.apps.SyncTracker.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.probase.potzr.SmartBanking.models.enums.Permission;
-import com.syncstate.apps.SyncTracker.models.User;
+import com.probase.potzr.SmartBanking.models.enums.TokenType;
+import com.syncstate.apps.SyncTracker.exceptions.SyncTrackerException;
+import com.syncstate.apps.SyncTracker.models.*;
+import com.syncstate.apps.SyncTracker.models.enums.ClientUserStatus;
+import com.syncstate.apps.SyncTracker.models.requests.ValidateTokenRequest;
 import com.syncstate.apps.SyncTracker.models.responses.AuthResponse;
+import com.syncstate.apps.SyncTracker.models.responses.SmartBankingResponse;
+import com.syncstate.apps.SyncTracker.repositories.IClientDomainRepository;
+import com.syncstate.apps.SyncTracker.repositories.IClientRepository;
+import com.syncstate.apps.SyncTracker.repositories.IClientUserRepository;
+import com.syncstate.apps.SyncTracker.repositories.ITokenRepository;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.mindrot.jbcrypt.BCrypt;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import com.nimbusds.jwt.*;
 import com.nimbusds.jose.*;
@@ -15,10 +26,13 @@ import com.nimbusds.jose.crypto.*;
 import com.nimbusds.jose.jwk.*;
 
 import java.io.IOException;
+import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.ParseException;
-import java.util.Date;
+import java.time.LocalDateTime;
+import java.util.*;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.security.cert.X509Certificate;
@@ -31,9 +45,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.security.interfaces.RSAPrivateKey;
-import java.util.Calendar;
-import java.util.Enumeration;
-import java.util.List;
+
 import jakarta.servlet.http.HttpServletRequest;
 
 //
@@ -57,6 +69,14 @@ public class TokenService {
     @Value("${service.provider.x509}")
     private String serverCertificate;
 
+    @Autowired
+    private ITokenRepository tokenRepository;
+
+    @Autowired
+    private IClientUserRepository clientUserRepository;
+
+    @Autowired
+    private IClientDomainRepository clientDomainRepository;
 
     private RSAKey getPublicKey(String certificateFile) {
         RSAKey publicKey = null;
@@ -342,6 +362,43 @@ public class TokenService {
             LOG.error(ex.toString());
         }
         return null;
+    }
+
+    public ResponseEntity validateToken(ValidateTokenRequest validateTokenRequest) throws SyncTrackerException {
+        String tokenVal = validateTokenRequest.getToken();
+        String data = validateTokenRequest.getData();
+        com.probase.potzr.SmartBanking.models.enums.TokenType tokenType = validateTokenRequest.getTokenType();
+
+        Token token = (Token)tokenRepository.validateToken(tokenVal, data, tokenType);
+        if(token!=null)
+        {
+            token.setUsedAt(LocalDateTime.now());
+            tokenRepository.save(token);
+
+            if(token.getTokenType().equals(TokenType.SIGNUP))
+            {
+                BigInteger clientUserId = token.getTokenOwnedByEntityId();
+                ClientUser clientUser = (ClientUser)this.clientUserRepository.getById(clientUserId);
+                clientUser.setClientUserStatus(ClientUserStatus.ACTIVE);
+                clientUserRepository.save(clientUser);
+
+                ClientDomain clientDomain = this.clientDomainRepository.getActiveClientDomainByClientId(clientUser.getClientId());
+
+                SmartBankingResponse smartBankingResponse = new SmartBankingResponse();
+                smartBankingResponse.setMessage("Your SyncTracker account has been activated. Please login now to start using SyncTracker.");
+                smartBankingResponse.setStatusCode(0);
+
+                Map<String, Object> map = new HashMap<>();
+                map.put("domain", clientDomain.getDomain());
+                if(clientDomain!=null)
+                    smartBankingResponse.setResponseObject(map);
+
+
+                return ResponseEntity.ok().body(smartBankingResponse);
+
+            }
+        }
+        throw new SyncTrackerException("Validation was not successful. Please try again");
     }
 
 }

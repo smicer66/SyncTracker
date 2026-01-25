@@ -16,4 +16,8 @@ public interface IClientRepository extends JpaRepository<Client, BigInteger> {
 
     @Query("Select u from Client u WHERE u.clientName = :clientName")
     Client getClientByClientName(String clientName);
+
+
+    @Query("Select u from Client u WHERE u.clientName = :clientName")
+    Client getClientByDomain(String domain);
 }

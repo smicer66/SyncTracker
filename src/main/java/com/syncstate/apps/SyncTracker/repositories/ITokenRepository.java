@@ -18,4 +18,10 @@ public interface ITokenRepository extends JpaRepository<Token, BigInteger> {
             "tp.tokenType = :tokenType AND " +
             "tp.expiredAt > CURRENT_TIMESTAMP")
     public Token getValidToken(BigInteger tokenOwnedByEntityId, String token, TokenType tokenType);
+
+
+    @Query("Select tp from Token tp where tp.token = :token AND " +
+            "tp.data = data AND tp.tokenType = :tokenType")
+    public Token validateToken(String token, String data, TokenType tokenType);
+
 }

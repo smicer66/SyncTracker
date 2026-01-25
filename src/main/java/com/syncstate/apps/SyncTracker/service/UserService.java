@@ -11,6 +11,7 @@ import com.syncstate.apps.SyncTracker.models.User;
 import com.syncstate.apps.SyncTracker.models.requests.CreateUserRequest;
 import com.syncstate.apps.SyncTracker.models.requests.SendInvitationRequest;
 import com.syncstate.apps.SyncTracker.models.responses.CreateUserResponse;
+import com.syncstate.apps.SyncTracker.models.responses.SmartBankingResponse;
 import com.syncstate.apps.SyncTracker.repositories.ITokenRepository;
 import com.syncstate.apps.SyncTracker.repositories.IUserRepository;
 import jakarta.servlet.http.HttpServletRequest;
@@ -32,7 +33,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -66,7 +69,7 @@ public class UserService {
 
 
 
-    public CreateUserResponse createNewUser(CreateUserRequest createUserRequest) {
+    public Map createNewUser(CreateUserRequest createUserRequest) {
         String encodedPassword = bCryptPasswordEncoder.encode(createUserRequest.getPassword());
 
         User user = new User();
@@ -81,15 +84,15 @@ public class UserService {
         Token token  = new Token();
         token.setTokenOwnedByEntityId(user.getUserId());
         token.setToken(RandomStringUtils.randomNumeric(6));
+        token.setData(RandomStringUtils.randomAlphanumeric(64).toLowerCase());
         token.setExpiredAt(LocalDateTime.now().plusHours(userAccountTokenValidPeriod));
         token.setTokenType(TokenType.SIGNUP);
         tokenRepository.save(token);
 
-        CreateUserResponse createUserResponse = new CreateUserResponse();
-        createUserResponse.setMobileNumber(user.getMobileNumber());
-        createUserResponse.setUsername(user.getUsername());
-
-        return createUserResponse;
+        Map<String, Object> map = new HashMap<>();
+        map.put("token", token);
+        map.put("user", user);
+        return map;
     }
 
 

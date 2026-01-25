@@ -97,6 +97,7 @@ public AuthenticationManager authManager(HttpSecurity http) throws Exception {
                     auth.requestMatchers("/test/**").permitAll();
                     auth.requestMatchers("/api/v1/user/create-new-user").permitAll();
                     auth.requestMatchers("/api/vi/client/create-client").permitAll();
+                    auth.requestMatchers("/api/vi/client/get-client-by-domain/**").permitAll();
                     auth.anyRequest().authenticated();
 
 
