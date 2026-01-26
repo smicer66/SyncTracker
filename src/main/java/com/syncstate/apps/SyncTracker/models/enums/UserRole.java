@@ -1,4 +1,4 @@
-package com.probase.potzr.SmartBanking.models.enums;
+package com.syncstate.apps.SyncTracker.models.enums;
 
 public enum UserRole {
     SYSTEM("SYSTEM"),

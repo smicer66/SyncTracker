@@ -76,6 +76,7 @@ public class UserController {
     @RequestMapping(value = "/validate-token", method = RequestMethod.POST)
     public ResponseEntity validateToken(@RequestBody ValidateTokenRequest validateTokenRequest)
     {
+        System.out.println(validateTokenRequest.getToken());
         ResponseEntity loginResponse = null;
         try {
             loginResponse = tokenService.validateToken(validateTokenRequest);

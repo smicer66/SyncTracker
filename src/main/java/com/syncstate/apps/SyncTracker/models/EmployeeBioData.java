@@ -45,10 +45,10 @@ public class EmployeeBioData {
     private Gender gender;
 
     @Column(name = "maritalStatus", nullable = true)
-    private com.probase.potzr.SmartBanking.models.enums.MaritalStatus maritalStatus;
+    private com.syncstate.apps.SyncTracker.models.enums.MaritalStatus maritalStatus;
 
     @Column(name = "title", nullable = true)
-    private com.probase.potzr.SmartBanking.models.enums.CustomerTitle title;
+    private com.syncstate.apps.SyncTracker.models.enums.CustomerTitle title;
 
     @Column(name = "createdAt", nullable = false)
     @JsonSerialize(using = JsonDateTimeSerializer.class)

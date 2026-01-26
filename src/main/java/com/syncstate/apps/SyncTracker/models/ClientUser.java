@@ -28,7 +28,7 @@ public class ClientUser {
     @Column(name = "clientId", nullable = true)
     private BigInteger clientId;
 
-    @Column(name = "clientId", nullable = true)
+    @Column(name = "clientUserStatus", nullable = true)
     private ClientUserStatus clientUserStatus;
 
     @JsonSerialize(using = JsonDateTimeSerializer.class)

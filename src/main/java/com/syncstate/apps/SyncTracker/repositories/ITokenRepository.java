@@ -1,8 +1,8 @@
 package com.syncstate.apps.SyncTracker.repositories;
 
 
-import com.probase.potzr.SmartBanking.models.enums.TokenType;
 import com.syncstate.apps.SyncTracker.models.Token;
+import com.syncstate.apps.SyncTracker.models.enums.TokenType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;

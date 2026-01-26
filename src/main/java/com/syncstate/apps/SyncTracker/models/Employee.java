@@ -2,8 +2,8 @@ package com.syncstate.apps.SyncTracker.models;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.probase.potzr.SmartBanking.models.enums.CustomerTitle;
-import com.probase.potzr.SmartBanking.models.enums.MaritalStatus;
+import com.syncstate.apps.SyncTracker.models.enums.CustomerTitle;
+import com.syncstate.apps.SyncTracker.models.enums.MaritalStatus;
 import com.syncstate.apps.SyncTracker.deserializers.TimestampDeserializer;
 import com.syncstate.apps.SyncTracker.serializers.JsonDateTimeSerializer;
 import jakarta.persistence.*;

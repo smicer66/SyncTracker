@@ -2,19 +2,17 @@ package com.syncstate.apps.SyncTracker.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.probase.potzr.SmartBanking.models.enums.Permission;
-import com.probase.potzr.SmartBanking.models.enums.TokenType;
+import com.syncstate.apps.SyncTracker.models.enums.Permission;
 import com.syncstate.apps.SyncTracker.exceptions.SyncTrackerException;
 import com.syncstate.apps.SyncTracker.models.*;
 import com.syncstate.apps.SyncTracker.models.enums.ClientUserStatus;
+import com.syncstate.apps.SyncTracker.models.enums.TokenType;
 import com.syncstate.apps.SyncTracker.models.requests.ValidateTokenRequest;
 import com.syncstate.apps.SyncTracker.models.responses.AuthResponse;
 import com.syncstate.apps.SyncTracker.models.responses.SmartBankingResponse;
 import com.syncstate.apps.SyncTracker.repositories.IClientDomainRepository;
-import com.syncstate.apps.SyncTracker.repositories.IClientRepository;
 import com.syncstate.apps.SyncTracker.repositories.IClientUserRepository;
 import com.syncstate.apps.SyncTracker.repositories.ITokenRepository;
-import org.apache.commons.lang3.RandomStringUtils;
 import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -367,7 +365,10 @@ public class TokenService {
     public ResponseEntity validateToken(ValidateTokenRequest validateTokenRequest) throws SyncTrackerException {
         String tokenVal = validateTokenRequest.getToken();
         String data = validateTokenRequest.getData();
-        com.probase.potzr.SmartBanking.models.enums.TokenType tokenType = validateTokenRequest.getTokenType();
+        String clientCode = validateTokenRequest.getClientCode();
+        TokenType tokenType = validateTokenRequest.getTokenType();
+
+        System.out.println("tokenVal" + tokenVal);
 
         Token token = (Token)tokenRepository.validateToken(tokenVal, data, tokenType);
         if(token!=null)

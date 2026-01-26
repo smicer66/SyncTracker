@@ -1,4 +1,4 @@
-package com.probase.potzr.SmartBanking.models.enums;
+package com.syncstate.apps.SyncTracker.models.enums;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;

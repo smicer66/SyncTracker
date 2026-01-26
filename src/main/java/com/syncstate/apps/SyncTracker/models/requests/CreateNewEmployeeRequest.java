@@ -35,7 +35,7 @@ public class CreateNewEmployeeRequest {
 
     private Gender gender;
 
-    private com.probase.potzr.SmartBanking.models.enums.MaritalStatus maritalStatus;
+    private com.syncstate.apps.SyncTracker.models.enums.MaritalStatus maritalStatus;
 
-    private com.probase.potzr.SmartBanking.models.enums.CustomerTitle title;
+    private com.syncstate.apps.SyncTracker.models.enums.CustomerTitle title;
 }

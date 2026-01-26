@@ -1,6 +1,7 @@
 package com.syncstate.apps.SyncTracker.models.requests;
 
 
+import com.syncstate.apps.SyncTracker.models.enums.TokenType;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,6 +10,7 @@ import lombok.Setter;
 public class ValidateTokenRequest {
     private String token;
     private String data;
-    private com.probase.potzr.SmartBanking.models.enums.TokenType tokenType;
+    private String clientCode;
+    private TokenType tokenType;
 
 }

@@ -3,15 +3,12 @@ package com.syncstate.apps.SyncTracker.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.probase.potzr.SmartBanking.models.enums.IdentificationDocumentType;
-import com.probase.potzr.SmartBanking.models.enums.TokenType;
-import com.probase.potzr.SmartBanking.models.enums.UserStatus;
+import com.syncstate.apps.SyncTracker.models.enums.UserStatus;
 import com.syncstate.apps.SyncTracker.models.Token;
 import com.syncstate.apps.SyncTracker.models.User;
+import com.syncstate.apps.SyncTracker.models.enums.TokenType;
 import com.syncstate.apps.SyncTracker.models.requests.CreateUserRequest;
 import com.syncstate.apps.SyncTracker.models.requests.SendInvitationRequest;
-import com.syncstate.apps.SyncTracker.models.responses.CreateUserResponse;
-import com.syncstate.apps.SyncTracker.models.responses.SmartBankingResponse;
 import com.syncstate.apps.SyncTracker.repositories.ITokenRepository;
 import com.syncstate.apps.SyncTracker.repositories.IUserRepository;
 import jakarta.servlet.http.HttpServletRequest;
