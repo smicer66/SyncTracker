@@ -40,6 +40,9 @@ public class EmploymentService {
     private IEmployeeBioDataRepository iEmployeeBioDataRepository;
 
     @Autowired
+    private IClientRepository iClientRepository;
+
+    @Autowired
     private IEmployeeContractRepository iEmployeeContractRepository;
 
     @Autowired
@@ -82,12 +85,31 @@ public class EmploymentService {
 
         Map responseObject = new HashMap();
         responseObject.put("newEmployee", employee);
-        
+
         SmartBankingResponse smartBankingResponse = new SmartBankingResponse();
         smartBankingResponse.setMessage("The new employee has been created. Please proceed to create a new contract for the employee");
         smartBankingResponse.setStatusCode(0);
         smartBankingResponse.setResponseObject(responseObject);
-        
+
+        return smartBankingResponse;
+    }
+
+
+
+    public SmartBankingResponse getEmployeeList(String clientCode) throws SyncTrackerException {
+
+        Client client = this.iClientRepository.getClientByClientCode(clientCode);
+        Collection<EmployeeBioData> employeeBioDataList = this.iEmployeeBioDataRepository.getEmployeeBioDataByClientId(client.getClientId());
+
+
+        Map responseObject = new HashMap();
+        responseObject.put("employeeBioDataList", employeeBioDataList);
+
+        SmartBankingResponse smartBankingResponse = new SmartBankingResponse();
+        smartBankingResponse.setMessage("The list of employees");
+        smartBankingResponse.setStatusCode(0);
+        smartBankingResponse.setResponseObject(responseObject);
+
         return smartBankingResponse;
     }
 

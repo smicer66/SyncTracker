@@ -100,6 +100,7 @@ public AuthenticationManager authManager(HttpSecurity http) throws Exception {
                     auth.requestMatchers("/api/vi/client/get-client-by-domain/**").permitAll();
                     auth.requestMatchers("/api/v1/user/validate-token").permitAll();
                     auth.requestMatchers("/api/v1/user/login").permitAll();
+                    auth.requestMatchers("/api/v1/employment/get-employees/**").permitAll();
 
                     auth.anyRequest().authenticated();
 

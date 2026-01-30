@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
+import java.util.Collection;
 
 @Repository
 public interface IEmployeeRepository extends JpaRepository<Employee, BigInteger> {
@@ -18,6 +19,7 @@ public interface IEmployeeRepository extends JpaRepository<Employee, BigInteger>
 
     @Query(value = "Select tp from Employee tp WHERE tp.deletedAt IS NULL AND tp.userId = :userId AND tp.clientId = :clientId")
     Employee getEmployeeByUserIdAndClientId(BigInteger userId, BigInteger clientId);
+
 
 
 }

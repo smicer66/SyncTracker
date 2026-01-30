@@ -29,6 +29,19 @@ public class EmploymentController {
 
 
 
+    @RequestMapping(value = "/get-employees/{clientCode}", method = RequestMethod.GET)
+    public ResponseEntity getEmployees(@PathVariable String clientCode )
+    {
+        SmartBankingResponse getEmployeeResponse = null;
+        try {
+
+            getEmployeeResponse = employmentService.getEmployeeList(clientCode);
+            return ResponseEntity.ok().body(getEmployeeResponse);
+        } catch (SyncTrackerException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     @RequestMapping(value = "/create-new-employee", method = RequestMethod.POST)
     public ResponseEntity createNewEmployee(@RequestBody CreateNewEmployeeRequest createNewEmployeeRequest)
     {

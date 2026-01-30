@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
+import java.util.Collection;
 
 @Repository
 public interface IEmployeeBioDataRepository extends JpaRepository<EmployeeBioData, BigInteger> {
@@ -19,4 +20,7 @@ public interface IEmployeeBioDataRepository extends JpaRepository<EmployeeBioDat
     @Query(value = "Select tp from employee_bio_data tp WHERE tp.deletedAt IS NULL AND tp.employeeId = :employeeId " +
             "AND tp.clientId = :clientId", nativeQuery = true)
     EmployeeBioData getEmployeeBioDetailsByEmployeeId(BigInteger employeeId, BigInteger clientId);
+
+    @Query(value = "Select tp from EmployeeBioData tp WHERE tp.deletedAt IS NULL AND tp.clientId = :clientId")
+    Collection<EmployeeBioData> getEmployeeBioDataByClientId(BigInteger clientId);
 }

@@ -26,6 +26,9 @@ public class EmployeeBioData {
     @Column(name = "employeeId", nullable = true)
     private BigInteger employeeId;
 
+    @Column(name = "clientId", nullable = true)
+    private BigInteger clientId;
+
     @Column(name = "firstName", nullable = false)
     private String firstName;
 
